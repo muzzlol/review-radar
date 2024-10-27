@@ -10,7 +10,7 @@ class URLRequest(BaseModel):
 class SingleReviewRequest(BaseModel):
     review: str = Field(..., description="Review text content.")
     threshold: float = Field(0.7, description="Confidence threshold for labeling a review as fake.")
-    rating: str = Field(..., pattern=r'^\d+/[5|10]$')  # Validates rating format like "5/5" or "7/10"
+    rating: str = Field(..., pattern=r'^\d/5$')  # Only allows ratings like "1/5", "2/5", etc.
     
 # @router.post("/openapi-verify-review")  
 class OpenAPIReviewRequest(BaseModel):
