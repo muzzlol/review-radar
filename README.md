@@ -74,3 +74,22 @@ In this Readme, you will find a guide on how to fork this Repository, add files 
 </details>
 
 ## Thanks for participating!
+
+
+
+
+
+
+# ReviewRadar
+
+**Key Differences Between Fake and Real Reviews**:
+
+1. **Overly Positive Language** (Fake): Exaggerated praise with phrases like "Love this!", "Amazing!", and "10 Stars", often without specifics.
+2. **Repetitive Phrasing** (Fake): Common phrases like "I love" and "the only problem is" repeated across reviews.
+3. **Personal Pronouns** (Fake): Frequent use of "I", "we", or "my" to create a forced personal connection.
+4. **Contradictory/Incomplete Sentences** (Fake): Some reviews seem cut off or make contradictory statements.
+5. **Time Mentions** (Fake): Fake reviews often mention usage duration to imply long-term experience.
+6. **Specific & Critical Feedback** (Real): Real reviews focus on specific product features, highlighting both pros and cons.
+7. **Practicality Focus** (Real): Emphasis on product functionality and day-to-day use.
+8. **Balanced Opinions** (Real): Mix of positive and negative points.
+9. **Short & Objective** (Real): Concise and direct feedback, avoiding unnecessary embellishment.
