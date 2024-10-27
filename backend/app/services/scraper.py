@@ -6,6 +6,7 @@ from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import LLMExtractionStrategy
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from pydantic import ValidationError
 import os
 
 # Load the .env file
@@ -55,17 +56,24 @@ async def extract_reviews(base_url: str, page_limit:int = 1):
                     print(f"No content extracted from {url}.")
                     break  # Stop if no more reviews are found
                 
-                print("result.extracted_content",result.extracted_content)
+                # print("result.extracted_content",result.extracted_content)
 
                 # Parse JSON response
                 try:
                     parsed_reviews = json.loads(result.extracted_content)
-                    all_reviews.extend(parsed_reviews)
+                    # all_reviews.extend(parsed_reviews)
+                    for review in parsed_reviews:
+                        try:
+                            # Validate and match fields to Review schema
+                            validated_review = Review(**review)
+                            all_reviews.append(validated_review.dict())  # Convert to dict for FastAPI compatibility
+                        except ValidationError as ve:
+                            print(f"Validation error for review: {ve}")
                 except json.JSONDecodeError as e:
                     print(f"Error parsing JSON from {url}: {e}")
                     break
                 
-                print("parsed reviews: ",parsed_reviews)
+                # print("parsed reviews: ",parsed_reviews)
             
             if page_number == page_limit:  # Limit to 1 page for testing/ default
                 break
