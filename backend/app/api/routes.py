@@ -18,7 +18,7 @@ async def analyze_reviews(url_request: URLRequest):
             raise HTTPException(status_code=404, detail="No reviews found.")
 
         # Detect fake reviews
-        analyzed_reviews = detect_fake_reviews(reviews, threshold= url_request.thresholdw)
+        analyzed_reviews = detect_fake_reviews(reviews, threshold= url_request.threshold)
         # analyzed_reviews = detect_fake_reviews(1)
 
         

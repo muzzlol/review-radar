@@ -18,4 +18,3 @@ app.add_middleware(
 
 # Include the API router
 app.include_router(router)
-
