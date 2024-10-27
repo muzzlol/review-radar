@@ -62,6 +62,7 @@ export default function HomePage() {
   const [threshold, setThreshold] = useState<ThresholdOption | undefined>()
   const [manualRating, setManualRating] = useState('')
   const [ratingError, setRatingError] = useState<string | null>(null)
+  const [manualReviews, setManualReviews] = useState<Review[]>([]);
 
   const handleModeSelect = (mode: 'automatic' | 'manual') => {
     setSelectedMode(mode)
@@ -127,24 +128,76 @@ export default function HomePage() {
     }
   }, [url, threshold]);
 
-  const handleManualSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const review = formData.get('review')
-    const thresholdValue = THRESHOLD_VALUES[threshold || 'strict']
-    const formattedRating = validateAndFormatRating(manualRating)
+  const handleManualSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();  // Keep this
     
-    if (!formattedRating) {
-      setRatingError('Please enter a valid rating (1-10)')
-      return
+    if (!threshold) {
+      alert('Please select a threshold value');
+      return;
     }
+
+    // Get the form element and review text directly from the form
+    const form = e.target as HTMLFormElement;
+    const reviewTextarea = form.querySelector('textarea[name="review"]') as HTMLTextAreaElement;
+    const reviewText = reviewTextarea?.value;
     
-    console.log('Submitted review:', {
-      review,
-      threshold: thresholdValue,
-      rating: formattedRating
-    })
-  }
+    if (!reviewText?.trim()) {
+      alert('Please enter a review');
+      return;
+    }
+
+    const formattedRating = validateAndFormatRating(manualRating);
+    if (!formattedRating) {
+      setRatingError('Please enter a valid rating (1-10)');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const thresholdValue = THRESHOLD_VALUES[threshold];
+      console.log('Sending manual review:', {
+        review: reviewText,
+        threshold: thresholdValue,
+        rating: formattedRating
+      });
+
+      const response = await fetch('http://localhost:8000/api/analyze-single-review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          review: reviewText,
+          threshold: thresholdValue,
+          rating: formattedRating
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Failed to analyze review');
+      }
+
+      console.log('Received response:', data);
+
+      // Add the new review to the list
+      const newReview = data.analyzed_reviews[0];
+      setManualReviews(prevReviews => [...prevReviews, newReview]);
+
+      // Clear the form inputs
+      reviewTextarea.value = '';  // Clear the textarea
+      setManualRating('');       // Clear the rating
+      setThreshold(undefined);    // Reset threshold selection
+
+    } catch (error) {
+      console.error('Error details:', error);
+      alert(error instanceof Error ? error.message : 'Failed to analyze review. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-screen bg-gray-100 overflow-x-hidden">
@@ -223,53 +276,81 @@ export default function HomePage() {
             )}
 
             {selectedMode === 'manual' && (
-              <form onSubmit={handleManualSubmit} className="space-y-4">
-                <div className="flex space-x-4">
-                  <Textarea
-                    name="review"
-                    placeholder="Enter your review here"
-                    className="flex-1 h-48 text-lg p-6 rounded-xl border-2 border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
-                  />
-                  <div className="flex flex-col space-y-4 w-[180px]">
-                    <Select
-                      value={threshold}
-                      onValueChange={(value: ThresholdOption) => setThreshold(value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue defaultValue="" placeholder="Set threshold" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="lenient">Lenient</SelectItem>
-                        <SelectItem value="average">Average</SelectItem>
-                        <SelectItem value="strict">Strict</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <div className="space-y-2">
-                      <Input
-                        type="number"
-                        placeholder="Rating (1-10)"
-                        value={manualRating}
-                        onChange={(e) => {
-                          setManualRating(e.target.value)
-                          setRatingError(null)
-                        }}
-                        className="w-full"
-                        min="1"
-                        max="10"
-                      />
-                      {ratingError && (
-                        <p className="text-red-500 text-sm">{ratingError}</p>
-                      )}
+              <div className="space-y-8">
+                <form onSubmit={handleManualSubmit} className="space-y-4">
+                  <div className="flex space-x-4">
+                    <Textarea
+                      name="review"
+                      placeholder="Enter your review here"
+                      className="flex-1 h-48 text-lg p-6 rounded-xl border-2 border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                    />
+                    <div className="flex flex-col space-y-4 w-[180px]">
+                      <Select
+                        value={threshold}
+                        onValueChange={(value: ThresholdOption) => setThreshold(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue defaultValue="" placeholder="Set threshold" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="lenient">Lenient</SelectItem>
+                          <SelectItem value="average">Average</SelectItem>
+                          <SelectItem value="strict">Strict</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="space-y-2">
+                        <Input
+                          type="number"
+                          placeholder="Rating (1-10)"
+                          value={manualRating}
+                          onChange={(e) => {
+                            setManualRating(e.target.value)
+                            setRatingError(null)
+                          }}
+                          className="w-full"
+                          min="1"
+                          max="10"
+                        />
+                        {ratingError && (
+                          <p className="text-red-500 text-sm">{ratingError}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <Button 
-                  type="submit"
-                  className="w-full bg-teal-600 hover:bg-teal-700 text-white text-xl py-6 rounded-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
-                >
-                  Submit Review
-                </Button>
-              </form>
+                  <div className="flex space-x-4">
+                    <Button 
+                      type="submit"
+                      className="flex-1 bg-teal-600 hover:bg-teal-700 text-white text-xl py-6 rounded-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Analyzing...' : 'Submit Review'}
+                    </Button>
+                    {manualReviews.length > 0 && (
+                      <Button 
+                        type="button"
+                        variant="outline"
+                        onClick={() => setManualReviews([])}
+                        className="bg-red-50 hover:bg-red-100 text-red-600 border-red-200 hover:border-red-300"
+                      >
+                        Clear All
+                      </Button>
+                    )}
+                  </div>
+                </form>
+
+                {manualReviews.length > 0 && (
+                  <div className="mt-12 space-y-8">
+                    <h2 className="text-2xl font-bold text-center mb-6">Analyzed Reviews</h2>
+                    {manualReviews.map((review, index) => (
+                      <ReviewCard 
+                        key={`manual-review-${index}`} 
+                        review={review} 
+                        index={index + 1} 
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
 
             <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">

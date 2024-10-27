@@ -2,7 +2,7 @@
 
 
 from fastapi import APIRouter, HTTPException
-from ..models import URLRequest, ReviewRequest
+from ..models import URLRequest, SingleReviewRequest, OpenAPIReviewRequest
 from ..services.scraper import extract_reviews
 from ..services.fake_review_classifier import detect_fake_reviews
 from ..services.open_api_controller import api_check_fake_reviews
@@ -42,27 +42,34 @@ async def analyze_reviews(url_request: URLRequest):
     
     
 @router.post("/analyze-single-review")
-# input format : { review: "Text content", threshold: 0.7, rating: "1/5" or "1/10"}
-async def anallyze_single_review(review_request:ReviewRequest):
+async def analyze_single_review(review_request: SingleReviewRequest):
     try:
-        reviews = [{"review_title": "", "review_text": review_request.review, "rating": review_request.rating}]
+        print(f"Received review request: {review_request}")  # Add logging
         
-        if not reviews or reviews[0]["review_title"].strip() == "":
+        reviews = [{
+            "review_title": "",  # Empty title is fine
+            "review_text": review_request.review,
+            "rating": review_request.rating
+        }]
+        
+        # Remove the empty title check since we're intentionally leaving it empty
+        if not reviews:
             raise HTTPException(status_code=404, detail="No reviews sent.")
 
         # Detect fake reviews
-        analyzed_reviews = detect_fake_reviews(reviews, threshold= review_request.threshold)
+        analyzed_reviews = detect_fake_reviews(reviews, threshold=review_request.threshold)
+        print(f"Analysis complete: {analyzed_reviews}")  # Add logging
 
         return {"analyzed_reviews": analyzed_reviews}
     except Exception as e:
-        print(e)
+        print(f"Error processing review: {str(e)}")  # Add logging
         raise HTTPException(status_code=500, detail=str(e))
 
 
 # free api 
 @router.post("/openapi-verify-review")
 # input format : { review: "Text content", threshold: ["high, medium, low"]}
-async def analyze_single_review(review_request:ReviewRequest):
+async def analyze_openapi_review(review_request: OpenAPIReviewRequest):
     try:
         threshold_map = {
             "high": 0.9,
@@ -74,12 +81,11 @@ async def analyze_single_review(review_request:ReviewRequest):
         review = [{"review_text": f"{review_request.review}"}]
         
         if not review:
-            raise HTTPException(status_code=404, detail="No review recieved.")
+            raise HTTPException(status_code=404, detail="No review received.")
 
-        # Detect fake reviews
-        analyzed_reviews = api_check_fake_reviews(review, threshold= mapped_threshold)
+        analyzed_reviews = api_check_fake_reviews(review, threshold=mapped_threshold)
 
         return {"analyzed_reviews": analyzed_reviews}
     except Exception as e:
-        print(e)
+        print(f"Error processing review: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
