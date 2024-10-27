@@ -45,6 +45,15 @@ const validateAndFormatRating = (value: string): string | null => {
   return null
 }
 
+type ApiResponse = {
+  analyzed_reviews: {
+    review_text: string
+    confidence: number
+    label: boolean
+    rating: string
+  }[]
+}
+
 export default function HomePage() {
   const [selectedMode, setSelectedMode] = useState<'automatic' | 'manual' | null>('automatic')
   const [url, setUrl] = useState('')
@@ -60,25 +69,63 @@ export default function HomePage() {
   }
 
   const handleUrlSubmit = useCallback(async () => {
-    setIsLoading(true)
-    setAnalyzedData(null)
-    
-    // Now we send both URL and threshold value
-    const thresholdValue = THRESHOLD_VALUES[threshold || 'strict']
-    console.log('Submitting with URL:', url, 'and threshold:', thresholdValue)
-    
-    // Simulating API call
-    setTimeout(() => {
-      const mockData: Review[] = [
-        {review_text: "This product exceeded my expectations! The quality is outstanding, and it's clear that a lot of thought went into its design. I've been using it for a few weeks now, and I'm consistently impressed with its performance. Highly recommend to anyone in the market for this type of product.", confidence: 92, label: true, rating: "5/5" },
-        {review_text: "Terrible quality, would not recommend. The product arrived damaged and customer service was unhelpful.", confidence: 78, label: false, rating: "1/5" },
-        {review_text: "Average product, nothing special. It does the job, but there's room for improvement in terms of design and functionality.", confidence: 75, label: true, rating: "3/5" },
-        {review_text: "Great value for money, very satisfied. While it's not perfect, it offers excellent features for its price point.", confidence: 88, label: true, rating: "4/5" },
-      ]
-      setAnalyzedData(mockData)
-      setIsLoading(false)
-    }, 2000) // 2 second delay to simulate API call
-  }, [url, threshold]) // Add threshold to dependencies
+    if (!url || !threshold) {
+      alert('Please enter both URL and threshold');
+      return;
+    }
+
+    setIsLoading(true);
+    setAnalyzedData(null);
+
+    try {
+      const thresholdValue = THRESHOLD_VALUES[threshold];
+      console.log('Sending request with:', {
+        url,
+        threshold: thresholdValue
+      });
+      
+      const response = await fetch('http://localhost:8000/api/analyze-reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: url,
+          threshold: thresholdValue
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        console.error('Server response:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        throw new Error(
+          errorData?.detail || 
+          `Server error: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data: ApiResponse = await response.json();
+      console.log('Received response:', data);
+      
+      const transformedData: Review[] = data.analyzed_reviews.map(review => ({
+        review_text: review.review_text,
+        confidence: review.confidence,
+        label: review.label,
+        rating: review.rating
+      }));
+
+      setAnalyzedData(transformedData);
+    } catch (error) {
+      console.error('Error details:', error);
+      alert(error instanceof Error ? error.message : 'Failed to analyze reviews. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [url, threshold]);
 
   const handleManualSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
