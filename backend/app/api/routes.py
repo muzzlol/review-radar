@@ -9,6 +9,7 @@ from ..services.fake_review_classifier import detect_fake_reviews
 router = APIRouter()
 
 @router.post("/analyze-reviews")
+# input format : { url : "http:somthing.com", threshold: 0.70}
 async def analyze_reviews(url_request: URLRequest):
     try:
         # Extract reviews from the provided URL
@@ -18,7 +19,7 @@ async def analyze_reviews(url_request: URLRequest):
             raise HTTPException(status_code=404, detail="No reviews found.")
 
         # Detect fake reviews
-        analyzed_reviews = detect_fake_reviews(reviews, threshold= url_request.thresholdw)
+        analyzed_reviews = detect_fake_reviews(reviews, threshold= url_request.threshold)
         # analyzed_reviews = detect_fake_reviews(1)
 
         
@@ -31,6 +32,7 @@ async def analyze_reviews(url_request: URLRequest):
     
     
 @router.post("/analyze-single-review")
+# input format : { review: "Text content", threshold: 0.7, rating: 1-5 integer}
 async def anallyze_single_review(review_request:ReviewRequest):
     try:
         reviews = [{"review_title": "", "review_text": f"{review_request.review}", "rating": f"{review_request.rating}/5"}]
