@@ -35,7 +35,7 @@ async def analyze_reviews(url_request: URLRequest):
 # input format : { review: "Text content", threshold: 0.7, rating: 1-5 integer}
 async def anallyze_single_review(review_request:ReviewRequest):
     try:
-        reviews = [{"review_title": "", "review_text": f"{review_request.review}", "rating": f"{review_request.rating}/5"}]
+        reviews = [{"review_title": "", "review_text": f"{review_request.review}", "rating": f"{review_request.rating}"}]
         
         if not reviews:
             raise HTTPException(status_code=404, detail="No reviews found.")
