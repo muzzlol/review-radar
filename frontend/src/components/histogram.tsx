@@ -31,7 +31,7 @@ export function ConfidenceHistogram({ data }: HistogramProps) {
         <CardDescription>Distribution of confidence scores (20% intervals)</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]"> {/* Increased height for better visibility */}
+        <div className="h-[265px]"> {/* Increased height for better visibility */}
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={prepareHistogramData}>
               <CartesianGrid strokeDasharray="3 3" />
