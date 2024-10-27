@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 import openai
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import LLMExtractionStrategy
