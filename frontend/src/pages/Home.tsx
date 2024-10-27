@@ -8,6 +8,14 @@ import { Header } from '@/components/header'
 import { RatingPieChart } from '@/components/pie-chart'
 import { ConfidenceHistogram } from '@/components/histogram'
 import { ReviewCard } from '@/components/review-card'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type Review = {
   review_text: string
@@ -16,11 +24,35 @@ type Review = {
   rating: string
 }
 
+type ThresholdOption = 'lenient' | 'average' | 'strict'
+type ThresholdValues = {
+  lenient: number
+  average: number
+  strict: number
+}
+
+const THRESHOLD_VALUES: ThresholdValues = {
+  lenient: 0.60,
+  average: 0.70,
+  strict: 0.90,
+}
+
+const validateAndFormatRating = (value: string): string | null => {
+  const numValue = parseInt(value)
+  if (isNaN(numValue) || numValue <= 0) return null
+  if (numValue <= 5) return `${numValue}/5`
+  if (numValue <= 10) return `${numValue}/10`
+  return null
+}
+
 export default function HomePage() {
   const [selectedMode, setSelectedMode] = useState<'automatic' | 'manual' | null>('automatic')
   const [url, setUrl] = useState('')
   const [analyzedData, setAnalyzedData] = useState<Review[] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [threshold, setThreshold] = useState<ThresholdOption | undefined>()
+  const [manualRating, setManualRating] = useState('')
+  const [ratingError, setRatingError] = useState<string | null>(null)
 
   const handleModeSelect = (mode: 'automatic' | 'manual') => {
     setSelectedMode(mode)
@@ -29,7 +61,12 @@ export default function HomePage() {
 
   const handleUrlSubmit = useCallback(async () => {
     setIsLoading(true)
-    setAnalyzedData(null) // Reset analyzed data before fetching new data
+    setAnalyzedData(null)
+    
+    // Now we send both URL and threshold value
+    const thresholdValue = THRESHOLD_VALUES[threshold || 'strict']
+    console.log('Submitting with URL:', url, 'and threshold:', thresholdValue)
+    
     // Simulating API call
     setTimeout(() => {
       const mockData: Review[] = [
@@ -41,14 +78,25 @@ export default function HomePage() {
       setAnalyzedData(mockData)
       setIsLoading(false)
     }, 2000) // 2 second delay to simulate API call
-  }, [])
+  }, [url, threshold]) // Add threshold to dependencies
 
   const handleManualSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const review = formData.get('review')
-    console.log('Submitted review:', review)
-    // Add your logic here to handle the manual review submission
+    const thresholdValue = THRESHOLD_VALUES[threshold || 'strict']
+    const formattedRating = validateAndFormatRating(manualRating)
+    
+    if (!formattedRating) {
+      setRatingError('Please enter a valid rating (1-10)')
+      return
+    }
+    
+    console.log('Submitted review:', {
+      review,
+      threshold: thresholdValue,
+      rating: formattedRating
+    })
   }
 
   return (
@@ -93,13 +141,30 @@ export default function HomePage() {
           <div className="mt-12 max-w-4xl mx-auto">
             {selectedMode === 'automatic' && (
               <div className="flex flex-col space-y-4">
-                <Input
-                  type="url"
-                  placeholder="Enter URL"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="text-lg p-6 rounded-xl border-2 border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
-                />
+                <div className="flex space-x-4 items-center">
+                  <Input
+                    type="url"
+                    placeholder="Enter URL"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="flex-1 text-lg p-6 rounded-xl border-2 border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                  />
+                  <Select
+                    value={threshold}
+                    onValueChange={(value: ThresholdOption) => setThreshold(value)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue defaultValue="" placeholder="Set threshold" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="lenient">Lenient</SelectItem>
+                        <SelectItem value="average">Average</SelectItem>
+                        <SelectItem value="strict">Strict</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button 
                   onClick={handleUrlSubmit}
                   className="bg-teal-600 hover:bg-teal-700 text-white text-xl py-6 rounded-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
@@ -112,11 +177,45 @@ export default function HomePage() {
 
             {selectedMode === 'manual' && (
               <form onSubmit={handleManualSubmit} className="space-y-4">
-                <Textarea
-                  name="review"
-                  placeholder="Enter your review here"
-                  className="w-full h-48 text-lg p-6 rounded-xl border-2 border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
-                />
+                <div className="flex space-x-4">
+                  <Textarea
+                    name="review"
+                    placeholder="Enter your review here"
+                    className="flex-1 h-48 text-lg p-6 rounded-xl border-2 border-teal-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                  />
+                  <div className="flex flex-col space-y-4 w-[180px]">
+                    <Select
+                      value={threshold}
+                      onValueChange={(value: ThresholdOption) => setThreshold(value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue defaultValue="" placeholder="Set threshold" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="lenient">Lenient</SelectItem>
+                        <SelectItem value="average">Average</SelectItem>
+                        <SelectItem value="strict">Strict</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="space-y-2">
+                      <Input
+                        type="number"
+                        placeholder="Rating (1-10)"
+                        value={manualRating}
+                        onChange={(e) => {
+                          setManualRating(e.target.value)
+                          setRatingError(null)
+                        }}
+                        className="w-full"
+                        min="1"
+                        max="10"
+                      />
+                      {ratingError && (
+                        <p className="text-red-500 text-sm">{ratingError}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
                 <Button 
                   type="submit"
                   className="w-full bg-teal-600 hover:bg-teal-700 text-white text-xl py-6 rounded-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
@@ -126,10 +225,10 @@ export default function HomePage() {
               </form>
             )}
 
-            <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-6xl mx-auto">
+            <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
               {isLoading ? (
                 <>
-                  <Card className="lg:col-span-5">
+                  <Card>
                     <CardHeader>
                       <Skeleton className="h-4 w-[250px]" />
                       <Skeleton className="h-4 w-[200px]" />
@@ -138,7 +237,7 @@ export default function HomePage() {
                       <Skeleton className="h-[250px] w-[250px] rounded-full mx-auto" />
                     </CardContent>
                   </Card>
-                  <Card className="lg:col-span-7">
+                  <Card>
                     <CardHeader>
                       <Skeleton className="h-4 w-[250px]" />
                       <Skeleton className="h-4 w-[200px]" />
@@ -150,12 +249,8 @@ export default function HomePage() {
                 </>
               ) : analyzedData ? (
                 <>
-                  <div className="lg:col-span-5">
-                    <RatingPieChart data={analyzedData} />
-                  </div>
-                  <div className="lg:col-span-7">
-                    <ConfidenceHistogram data={analyzedData} />
-                  </div>
+                  <RatingPieChart data={analyzedData} />
+                  <ConfidenceHistogram data={analyzedData} />
                 </>
               ) : null}
             </div>
