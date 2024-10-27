@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
 
 type Review = {
   review_text: string
@@ -53,6 +54,7 @@ type ApiResponse = {
 }
 
 export default function HomePage() {
+  const { toast } = useToast()
   const [selectedMode, setSelectedMode] = useState<'automatic' | 'manual' | null>('automatic')
   const [url, setUrl] = useState('')
   const [analyzedData, setAnalyzedData] = useState<Review[] | null>(null)
@@ -118,9 +120,21 @@ export default function HomePage() {
       }));
 
       setAnalyzedData(transformedData);
+
+      // Add this after successful analysis
+      toast({
+        title: "Reviews Analyzed",
+        description: "Successfully analyzed reviews from the provided URL",
+        variant: "default",
+      })
     } catch (error) {
       console.error('Error details:', error);
       alert(error instanceof Error ? error.message : 'Failed to analyze reviews. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to analyze reviews. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false);
     }
@@ -186,9 +200,20 @@ export default function HomePage() {
       reviewTextarea.value = '';  // Clear the textarea
       setManualRating('');       // Clear the rating
 
+      // Add this after successful analysis
+      toast({
+        title: "Review Analyzed",
+        description: "Successfully analyzed the provided review",
+        variant: "default",
+      })
     } catch (error) {
       console.error('Error details:', error);
       alert(error instanceof Error ? error.message : 'Failed to analyze review. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to analyze review. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false);
     }
