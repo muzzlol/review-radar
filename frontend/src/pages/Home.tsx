@@ -79,6 +79,10 @@ export default function HomePage() {
 
     try {
       const thresholdValue = THRESHOLD_VALUES[threshold];
+      console.log('Sending request with:', {
+        url,
+        threshold: thresholdValue
+      });
       
       const response = await fetch('http://localhost:8000/api/analyze-reviews', {
         method: 'POST',
@@ -92,12 +96,21 @@ export default function HomePage() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => null);
+        console.error('Server response:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        throw new Error(
+          errorData?.detail || 
+          `Server error: ${response.status} ${response.statusText}`
+        );
       }
 
       const data: ApiResponse = await response.json();
+      console.log('Received response:', data);
       
-      // Transform the backend response to match our frontend Review type
       const transformedData: Review[] = data.analyzed_reviews.map(review => ({
         review_text: review.review_text,
         confidence: review.confidence,
@@ -107,8 +120,8 @@ export default function HomePage() {
 
       setAnalyzedData(transformedData);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to analyze reviews. Please try again.');
+      console.error('Error details:', error);
+      alert(error instanceof Error ? error.message : 'Failed to analyze reviews. Please try again.');
     } finally {
       setIsLoading(false);
     }

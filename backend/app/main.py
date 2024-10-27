@@ -16,3 +16,8 @@ app.add_middleware(
 
 # Include the API router
 app.include_router(router)
+
+# Add this for debugging
+@app.get("/")
+async def root():
+    return {"message": "API is running"}
