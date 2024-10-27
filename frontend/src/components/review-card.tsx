@@ -19,7 +19,7 @@ export function ReviewCard({ review, index }: ReviewCardProps) {
           {index}
         </div>
         <div className="ml-12 pr-4">
-          <p className="text-sm text-muted-foreground mb-2">Review:</p>
+          <p className="text-sm text-muted-foreground mb-2">Review</p>
           <div className="max-h-32 overflow-y-auto">
             <p className="text-sm">{review.review_text}</p>
           </div>

@@ -39,10 +39,8 @@ const THRESHOLD_VALUES: ThresholdValues = {
 
 const validateAndFormatRating = (value: string): string | null => {
   const numValue = parseInt(value)
-  if (isNaN(numValue) || numValue <= 0) return null
-  if (numValue <= 5) return `${numValue}/5`
-  if (numValue <= 10) return `${numValue}/10`
-  return null
+  if (isNaN(numValue) || numValue <= 0 || numValue > 5) return null
+  return `${numValue}/5`
 }
 
 type ApiResponse = {
@@ -129,13 +127,8 @@ export default function HomePage() {
   }, [url, threshold]);
 
   const handleManualSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();  // Keep this
+    e.preventDefault();
     
-    if (!threshold) {
-      alert('Please select a threshold value');
-      return;
-    }
-
     // Get the form element and review text directly from the form
     const form = e.target as HTMLFormElement;
     const reviewTextarea = form.querySelector('textarea[name="review"]') as HTMLTextAreaElement;
@@ -148,14 +141,17 @@ export default function HomePage() {
 
     const formattedRating = validateAndFormatRating(manualRating);
     if (!formattedRating) {
-      setRatingError('Please enter a valid rating (1-10)');
+      setRatingError('Please enter a valid rating (1-5)');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const thresholdValue = THRESHOLD_VALUES[threshold];
+      // Keep the current threshold if it exists, otherwise use 'average'
+      const currentThreshold = threshold || 'average';
+      const thresholdValue = THRESHOLD_VALUES[currentThreshold];
+      
       console.log('Sending manual review:', {
         review: reviewText,
         threshold: thresholdValue,
@@ -189,7 +185,6 @@ export default function HomePage() {
       // Clear the form inputs
       reviewTextarea.value = '';  // Clear the textarea
       setManualRating('');       // Clear the rating
-      setThreshold(undefined);    // Reset threshold selection
 
     } catch (error) {
       console.error('Error details:', error);
@@ -301,7 +296,7 @@ export default function HomePage() {
                       <div className="space-y-2">
                         <Input
                           type="number"
-                          placeholder="Rating (1-10)"
+                          placeholder="Rating (1-5)"  // Updated placeholder
                           value={manualRating}
                           onChange={(e) => {
                             setManualRating(e.target.value)
@@ -309,7 +304,7 @@ export default function HomePage() {
                           }}
                           className="w-full"
                           min="1"
-                          max="10"
+                          max="5"  // Changed from 10 to 5
                         />
                         {ratingError && (
                           <p className="text-red-500 text-sm">{ratingError}</p>
