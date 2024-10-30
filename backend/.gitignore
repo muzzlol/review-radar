@@ -17,3 +17,5 @@ venv/
 # IDEs and Editors
 .vscode/
 .idea/
+
+.DS_Store
