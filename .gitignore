@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+*.pyc
+__pycache__/
+
+# Environment Variables
+.env
+
+# Models and Data
+/models/fake_review_model.pkl
+/models/fake_review_model.joblib
+/models/fake_reviews.csv
+
+# Virtual Environment
+venv/
+.env/
