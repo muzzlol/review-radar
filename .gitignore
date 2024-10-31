@@ -38,3 +38,10 @@ __pycache__/
 # Virtual Environment
 venv/
 .env/
+
+# Poetry
+.venv/
+poetry.lock
+
+
+
