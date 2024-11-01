@@ -126,12 +126,12 @@ To reproduce ReviewRadar on your local system, follow the steps below for both t
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/yourusername/ReviewRadar.git
+    git clone https://github.com/muzzlol/review-radar.git
     ```
 
 2. **Navigate to the Frontend Directory**:
     ```bash
-    cd ReviewRadar/frontend
+    cd review-radar/frontend
     ```
 
 3. **Install Dependencies**:
@@ -150,7 +150,7 @@ To reproduce ReviewRadar on your local system, follow the steps below for both t
 
 1. **Navigate to the Backend Directory**:
     ```bash
-    cd ReviewRadar/backend
+    cd ../backend
     ```
 
 2. **Set Up Environment Variables**:
@@ -184,7 +184,7 @@ To reproduce ReviewRadar on your local system, follow the steps below for both t
             pip install --upgrade pip
             pip install -r requirements.txt
             ```
-    - **Using Poetry**:
+    - **Using `Poetry`**:
         1. **Install Poetry** (if not already installed):
             ```bash
             curl -sSL https://install.python-poetry.org | python3 -
