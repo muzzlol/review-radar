@@ -2,7 +2,7 @@
 
 ReviewRadar is a web application that classifies reviews as **real** or **fake** based on a user-defined strictness level. It leverages **crawl4ai** for scraping reviews, utilizes an **OpenAI LLM extraction strategy** for JSON formatting, and employs a **pretrained SVC classifier** with **88% accuracy** for classification.
 
-Users can input URLs to review pages or individual reviews for immediate classification. Additionally, ReviewRadar offers an **open API** for developers to integrate fake review detection into their own applications.
+Users can input URLs to review pages or individual reviews for immediate classification. Additionally, there's an **open API** to integrate the fake review detection service into another application.
 
 ## Table of Contents
 
