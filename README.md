@@ -1,13 +1,26 @@
 # ReviewRadar
 
-# ReviewRadar: Fake vs Genuine Review Detection
+ReviewRadar is a web application that classifies reviews as **real** or **fake** based on a user-defined strictness level. It leverages **crawl4ai** for scraping reviews, utilizes an **OpenAI LLM extraction strategy** for JSON formatting, and employs a **pretrained SVC classifier** with **88% accuracy** for classification.
 
-ReviewRadar is a web application that allows users to send links to review pages, and classifies each review as **real** or **fake** based on a user-defined strictness level. The application uses **crawl4ai** to scrape reviews from the provided URLs, processes them through an **OpenAI LLM extraction strategy** to generate the required JSON format, and then passes the reviews to a **pretrained classifier** with **88% accuracy** for classification.
+Users can input URLs to review pages or individual reviews for immediate classification. Additionally, ReviewRadar offers an **open API** for developers to integrate fake review detection into their own applications.
 
-Users can also input individual reviews for classification directly on the app. Additionally, the app provides an **open API** that allows developers to use the model for review classification through a simple JSON interface.
+## Table of Contents
 
+- [Key Differences Between Fake and Real Reviews](#key-differences-between-fake-and-real-reviews)
+- [Features](#features)
+- [API Endpoint](#api-endpoint)
+- [Model Approach](#model-approach)
+- [How It Works](#how-it-works)
+- [Usage Example](#usage-example)
+- [Installation & Setup](#installation--setup)
+  - [Prerequisites](#prerequisites)
+  - [Frontend Setup](#frontend-setup)
+  - [Backend Setup](#backend-setup)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-**Key Differences Between Fake and Real Reviews**:
+## Key Differences Between Fake and Real Reviews
 
 1. **Overly Positive Language** (Fake): Exaggerated praise with phrases like "Love this!", "Amazing!", and "10 Stars", often without specifics.
 2. **Repetitive Phrasing** (Fake): Common phrases like "I love" and "the only problem is" repeated across reviews.
@@ -21,16 +34,16 @@ Users can also input individual reviews for classification directly on the app. 
 
 ## Features
 
-- **Review Page Analysis**: Users can submit URLs containing reviews, which are scraped and classified as real or fake based on user-selected strictness levels.
-- **Individual Review Testing**: Users can input single reviews and get immediate feedback on their authenticity.
-- **Data Visualization**: The app offers insightful visualizations, such as pie charts and histograms, to help users analyze the distribution of real and fake reviews on a page.
-- **Open API**: Developers can access an API endpoint to integrate the model into their own applications for fake review detection.
+- **Review Page Analysis**: Submit URLs containing reviews to be scraped and classified as real or fake based on selected strictness levels.
+- **Individual Review Testing**: Input single reviews and receive immediate authenticity feedback.
+- **Data Visualization**: View insightful visualizations like pie charts and histograms to analyze the distribution of real and fake reviews.
+- **Open API**: Access an API endpoint to integrate fake review detection into your own applications.
 
 ## API Endpoint
 
 **`POST /api/openapi-verify-review`**
 
-Developers can use this endpoint to verify reviews through a simple JSON interface. The input includes the review text and a threshold level (high, medium, or low), and the output is a classification of the review as real or fake.
+Developers can verify reviews through a simple JSON interface. The input includes the review text and a threshold level (`high`, `medium`, or `low`), and the output is a classification of the review as real or fake.
 
 ### Example Request:
 
@@ -55,26 +68,23 @@ Developers can use this endpoint to verify reviews through a simple JSON interfa
 
 ## Model Approach
 
-**Objective**: To classify reviews as fake or genuine using text-based features.
+**Objective**: Classify reviews as fake or genuine using text-based features.
 
-### Algorithm:
+### Algorithm
 
-- **Support Vector Classifier (SVC)**, chosen for its effectiveness in text classification tasks.
+- **Support Vector Classifier (SVC)**: Chosen for its effectiveness in text classification tasks.
 
 ### Process
 
 1. **Data Preparation**:
-
    - Loaded a dataset of reviews and preprocessed the text (removing punctuation, filtering stop words).
    - Split the dataset into training and testing sets.
 
 2. **Text Processing**:
-
-   - Used a text processing function to prepare reviews for vectorization.
+   - Prepared reviews for vectorization using a text processing function.
    - Applied **CountVectorizer** to convert the text into a bag-of-words model.
 
 3. **Model Training**:
-
    - Created a pipeline combining:
      - **CountVectorizer**: Converts text into numerical vectors.
      - **TF-IDF Transformer**: Scales vectors by term frequency-inverse document frequency.
@@ -84,21 +94,21 @@ Developers can use this endpoint to verify reviews through a simple JSON interfa
 4. **Model Saving**:
    - Saved the trained model using **joblib** for later predictions.
 
-### Outcome:
+### Outcome
 
-- The model achieves **88% accuracy** in classifying reviews as real or fake.
-- Successfully loads the model for inference, allowing users to analyze new reviews.
+- Achieves **88% accuracy** in classifying reviews as real or fake.
+- Allows users to analyze new reviews by loading the model for inference.
 
 ## How It Works
 
-1. **User Submission**: Users submit a URL containing reviews or an individual review.
-2. **Scraping and Parsing**: The application scrapes reviews from the URL using **crawl4ai**, and the scraped content is processed through an OpenAI LLM to generate structured JSON data.
-3. **Review Classification**: The structured data is passed through the pretrained SVC classifier to identify fake reviews.
-4. **Visualization**: The app displays the results, offering visual insights through pie charts and histograms.
+1. **User Submission**: Submit a URL containing reviews or an individual review.
+2. **Scraping and Parsing**: Scrapes reviews from the URL using **crawl4ai** and processes the content through an OpenAI LLM to generate structured JSON data.
+3. **Review Classification**: Passes the structured data through the pretrained SVC classifier to identify fake reviews.
+4. **Visualization**: Displays the results with visual insights through pie charts and histograms.
 
 ## Usage Example
 
-Users can submit a link to a review page and get a visual breakdown of real vs fake reviews in a pie chart and histogram format, based on their chosen strictness level (high, medium, low). They can also manually input a review to check its authenticity.
+Submit a link to a review page to receive a visual breakdown of real vs. fake reviews in pie chart and histogram formats based on the chosen strictness level (`high`, `medium`, `low`). Alternatively, manually input a review to check its authenticity.
 
 ## Installation & Setup
 
@@ -111,7 +121,7 @@ To reproduce ReviewRadar on your local system, follow the steps below for both t
 - **Backend**:
   - [Python](https://www.python.org/) (v3.12.x)
   - [pip](https://pip.pypa.io/en/stable/) (comes with Python)
-  
+
 ### Frontend Setup
 
 1. **Clone the Repository**:
@@ -138,37 +148,12 @@ To reproduce ReviewRadar on your local system, follow the steps below for both t
 
 ### Backend Setup
 
-There are two methods to set up the backend: using `pip` with `requirements.txt` or using Poetry. Below are the instructions for both methods.
-
-#### Method 1: Using `pip` with `requirements.txt`
-
 1. **Navigate to the Backend Directory**:
     ```bash
     cd ReviewRadar/backend
     ```
 
-2. **Create a Virtual Environment**:
-    ```bash
-    python3.12 -m venv venv
-    ```
-
-3. **Activate the Virtual Environment**:
-    - **On macOS/Linux**:
-        ```bash
-        source venv/bin/activate
-        ```
-    - **On Windows**:
-        ```bash
-        venv\Scripts\activate
-        ```
-
-4. **Install Dependencies**:
-    ```bash
-    pip install --upgrade pip
-    pip install -r requirements.txt
-    ```
-
-5. **Set Up Environment Variables**:
+2. **Set Up Environment Variables**:
     - Create a `.env` file in the `backend` directory based on the `.env.example` provided.
     - Add necessary environment variables, such as your OpenAI API key.
     
@@ -176,47 +161,57 @@ There are two methods to set up the backend: using `pip` with `requirements.txt`
     OPENAI_API_KEY=your_openai_api_key
     ```
 
-6. **Run the Backend Server**:
-    ```bash
-    uvicorn main:app --reload
-    ```
+3. **Choose Your Installation Method**:
 
-    The backend server will run on `http://localhost:8000` by default.
+    - **Using `pip`**:
+        1. **Create a Virtual Environment**:
+            ```bash
+            python3.12 -m venv venv
+            ```
 
-#### Method 2: Using Poetry
+        2. **Activate the Virtual Environment**:
+            - **On macOS/Linux**:
+                ```bash
+                source venv/bin/activate
+                ```
+            - **On Windows**:
+                ```bash
+                venv\Scripts\activate
+                ```
 
-1. **Ensure Python 3.12+ is Installed**.
+        3. **Install Dependencies**:
+            ```bash
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            ```
+    - **Using Poetry**:
+        1. **Install Poetry** (if not already installed):
+            ```bash
+            curl -sSL https://install.python-poetry.org | python3 -
+            ```
 
-2. **Navigate to the Backend Directory**:
-    ```bash
-    cd ReviewRadar/backend
-    ```
+        2. **Set Python Version**:
+            ```bash
+            poetry env use python3.12
+            ```
 
-3. **Install Poetry**:
-    ```bash
-    curl -sSL https://install.python-poetry.org | python3 -
-    ```
-    - **Add Poetry to PATH**: Follow the on-screen instructions after installation to add Poetry to your system's PATH.
+        3. **Check Python Version & Environment Path**:
+            ```bash
+            poetry env info
+            ```
+            Take note of the `Path` field in the output - you can use this path as the Python interpreter in VS Code or your preferred editor's settings.
 
-4. **Install Dependencies**:
-    ```bash
-    poetry install
-    ```
+        4. **Activate the Virtual Environment**:
+            ```bash
+            poetry shell
+            ```
 
-5. **Activate the Virtual Environment**:
-    ```bash
-    poetry shell
-    ```
+        5. **Install Dependencies**:
+            ```bash
+            poetry install
+            ```
 
-6. **Set Up Environment Variables**:
-    - Create a `.env` file in the `backend` directory based on the `.env.example` provided.
-    - Add necessary environment variables, such as your OpenAI API key.
-    
-    ```env:backend/.env.example
-    OPENAI_API_KEY=your_openai_api_key
-    ```
-
-7. **Run the Backend Server**:
+4. **Run the Backend Server**:
     ```bash
     uvicorn main:app --reload
     ```
@@ -225,7 +220,7 @@ There are two methods to set up the backend: using `pip` with `requirements.txt`
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or submit a pull request for any changes or improvements. Future work underway is on upgrading model to a deeplearning one to capture the sequential relationship between words and the indexing of words in the overall review text.
+Contributions are welcome! Please open an issue or submit a pull request for any changes or improvements. Future work includes upgrading the model to a deep learning approach to better capture the sequential relationships between words and their indexing in the overall review text.
 
 ## License
 
