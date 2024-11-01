@@ -1,4 +1,3 @@
-
 # ReviewRadar
 
 # ReviewRadar: Fake vs Genuine Review Detection
@@ -101,6 +100,133 @@ Developers can use this endpoint to verify reviews through a simple JSON interfa
 
 Users can submit a link to a review page and get a visual breakdown of real vs fake reviews in a pie chart and histogram format, based on their chosen strictness level (high, medium, low). They can also manually input a review to check its authenticity.
 
-## Conclusion
+## Installation & Setup
 
-ReviewRadar simplifies the process of detecting fake reviews, offering both a web interface and a developer-friendly API. Its robust classification pipeline, powered by SVC, ensures high accuracy and reliable results, making it an essential tool for consumers and developers alike.
+To reproduce ReviewRadar on your local system, follow the steps below for both the frontend and backend setups.
+
+### Prerequisites
+
+- **Frontend**:
+  - [Node.js](https://nodejs.org/) (v14.x or higher)
+- **Backend**:
+  - [Python](https://www.python.org/) (v3.12.x)
+  - [pip](https://pip.pypa.io/en/stable/) (comes with Python)
+  
+### Frontend Setup
+
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/yourusername/ReviewRadar.git
+    ```
+
+2. **Navigate to the Frontend Directory**:
+    ```bash
+    cd ReviewRadar/frontend
+    ```
+
+3. **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+4. **Start the Frontend Application**:
+    ```bash
+    npm start
+    ```
+
+    The application will run on `http://localhost:3000` by default.
+
+### Backend Setup
+
+There are two methods to set up the backend: using `pip` with `requirements.txt` or using Poetry. Below are the instructions for both methods.
+
+#### Method 1: Using `pip` with `requirements.txt`
+
+1. **Navigate to the Backend Directory**:
+    ```bash
+    cd ReviewRadar/backend
+    ```
+
+2. **Create a Virtual Environment**:
+    ```bash
+    python3.12 -m venv venv
+    ```
+
+3. **Activate the Virtual Environment**:
+    - **On macOS/Linux**:
+        ```bash
+        source venv/bin/activate
+        ```
+    - **On Windows**:
+        ```bash
+        venv\Scripts\activate
+        ```
+
+4. **Install Dependencies**:
+    ```bash
+    pip install --upgrade pip
+    pip install -r requirements.txt
+    ```
+
+5. **Set Up Environment Variables**:
+    - Create a `.env` file in the `backend` directory based on the `.env.example` provided.
+    - Add necessary environment variables, such as your OpenAI API key.
+    
+    ```env:backend/.env.example
+    OPENAI_API_KEY=your_openai_api_key
+    ```
+
+6. **Run the Backend Server**:
+    ```bash
+    uvicorn main:app --reload
+    ```
+
+    The backend server will run on `http://localhost:8000` by default.
+
+#### Method 2: Using Poetry
+
+1. **Ensure Python 3.12+ is Installed**.
+
+2. **Navigate to the Backend Directory**:
+    ```bash
+    cd ReviewRadar/backend
+    ```
+
+3. **Install Poetry**:
+    ```bash
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
+    - **Add Poetry to PATH**: Follow the on-screen instructions after installation to add Poetry to your system's PATH.
+
+4. **Install Dependencies**:
+    ```bash
+    poetry install
+    ```
+
+5. **Activate the Virtual Environment**:
+    ```bash
+    poetry shell
+    ```
+
+6. **Set Up Environment Variables**:
+    - Create a `.env` file in the `backend` directory based on the `.env.example` provided.
+    - Add necessary environment variables, such as your OpenAI API key.
+    
+    ```env:backend/.env.example
+    OPENAI_API_KEY=your_openai_api_key
+    ```
+
+7. **Run the Backend Server**:
+    ```bash
+    uvicorn main:app --reload
+    ```
+
+    The backend server will run on `http://localhost:8000` by default.
+
+## Contributing
+
+Contributions are welcome. Please open an issue or submit a pull request for any changes or improvements. Future work underway is on upgrading model to a deeplearning one to capture the sequential relationship between words and the indexing of words in the overall review text.
+
+## License
+
+MIT License. See `LICENSE` for more information.
