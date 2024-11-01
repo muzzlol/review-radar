@@ -1,8 +1,6 @@
 import nltk
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import warnings
 import string
 import nltk
@@ -10,17 +8,15 @@ from nltk.corpus import stopwords
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
 nltk.download('stopwords')
-nltk.download('wordnet')
 nltk.download('omw-1.4')
+nltk.download('wordnet')
 nltk.download('punkt')
-
 nltk.download('punkt_tab')
 
 # Set to ignore warnings
@@ -114,20 +110,18 @@ svc_pred = pipeline.predict(review_test)
 print('Model Prediction Accuracy:',str(np.round(accuracy_score(label_test,svc_pred)*100,2)) + '%')
 
 
-import pickle
+from joblib import dump, load
 
-# Assuming `pipeline` is your trained model
-with open('backend/models/fake_review_model.pkl', 'wb') as file:
-    pickle.dump(pipeline, file)
+# Save the model using joblib
+dump(pipeline, '../models/fake_review_model.joblib')
 
-print("Model saved to backend/models/fake_review_model.pkl")
+print("Model saved to backend/models/fake_review_model.joblib")
 
-# Load the model from the pickle file
-with open('backend/models/fake_review_model.pkl', 'rb') as file:
-    loaded_model = pickle.load(file)
+# Load the model using joblib
+loaded_model = load('../models/fake_review_model.joblib')
 
 # Test the loaded model with some data
-test_data = ['very bad product.','bad' , 'very bad noob']  # Replace with your actual test data
+test_data = ['very bad product.', 'bad', 'very bad noob']  # Replace with your actual test data
 predictions = loaded_model.predict(test_data)
 
 # Get the class labels and probabilities

@@ -1,6 +1,3 @@
-#TODO : POST /api/analyze-review endpoint. use fastapi apirouter
-
-
 from fastapi import APIRouter, HTTPException
 from ..models import URLRequest, SingleReviewRequest, OpenAPIReviewRequest
 from ..services.scraper import extract_reviews
@@ -9,7 +6,7 @@ from ..services.open_api_controller import api_check_fake_reviews
 # from app.services.preprocessing import text_process
 
 # Add prefix to the router
-router = APIRouter(prefix="/api")  # This ensures all routes have /api prefix
+router = APIRouter(prefix="/api")
 
 @router.post("/analyze-reviews")
 # input format : { url : "http:somthing.com", threshold: 0.70}

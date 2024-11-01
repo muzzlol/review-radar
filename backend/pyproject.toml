@@ -10,6 +10,13 @@ python = "^3.12"
 fastapi = "^0.115.4"
 openai = "^1.53.0"
 crawl4ai = "^0.3.72"
+nltk = "^3.9.1"
+python-dotenv = "^1.0.1"
+ipykernel = "^6.29.5"
+uvicorn = "^0.32.0"
+setuptools = "^75.3.0"
+scikit-learn = "^1.5.2"
+pandas = "^2.2.3"
 
 
 [build-system]

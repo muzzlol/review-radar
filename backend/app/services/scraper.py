@@ -147,5 +147,3 @@ async def extract_reviews(base_url: str, page_limit:int = 1):
 
 #         page_number += 1  # Move to the next page
 #     return all_reviews
-
-
