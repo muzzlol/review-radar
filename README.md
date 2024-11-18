@@ -213,7 +213,7 @@ To reproduce ReviewRadar on your local system, follow the steps below for both t
 
 4. **Run the Backend Server**:
     ```bash
-    uvicorn main:app --reload
+    poetry run uvicorn main:app --reload
     ```
 
     The backend server will run on `http://localhost:8000` by default.
